@@ -45,7 +45,7 @@
     <ClCompile Include="vendor\imgui-1.83\imgui_demo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine.cpp">
+    <ClCompile Include="src\Engine\Engine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\UI\UI.cpp">
@@ -68,7 +68,7 @@
     <ClInclude Include="src\Debug\Log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine.h">
+    <ClInclude Include="src\Engine\Engine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\UI\UI.h">
