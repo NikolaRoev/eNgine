@@ -102,6 +102,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Engine.cpp" />
     <ClCompile Include="src\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -109,6 +110,7 @@
     <ClCompile Include="src\ResourceManager\ResourceManager.cpp" />
     <ClCompile Include="src\ResourceManager\Utility.cpp" />
     <ClCompile Include="src\Source.cpp" />
+    <ClCompile Include="src\UI\UI.cpp" />
     <ClCompile Include="vendor\imgui-1.83\imgui.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
@@ -135,11 +137,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Engine.h" />
     <ClInclude Include="src\Debug\Config.h" />
     <ClInclude Include="src\Debug\Log.h" />
     <ClInclude Include="src\pch.h" />
     <ClInclude Include="src\ResourceManager\ResourceManager.h" />
     <ClInclude Include="src\ResourceManager\Utility.h" />
+    <ClInclude Include="src\UI\UI.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
