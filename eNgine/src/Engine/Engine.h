@@ -1,5 +1,6 @@
 #pragma once
 #include "pch.h"
+#include "ResourceManager/ResourceManager.h"
 
 //======================================================================================================================================================
 
@@ -8,6 +9,8 @@ private:
 	sf::RenderWindow window;
 	sf::Event event{ sf::Event::MouseMoved };
 	sf::Clock clock;
+
+	ResourceManager resource_manager;
 
 public:
 	Engine();
