@@ -29,7 +29,7 @@ void Engine::loop() {
 
 
 		//UI:
-		resources_ui(resource_manager);
+		resources_ui(resource_manager, window);
 
 		//Draw:
 

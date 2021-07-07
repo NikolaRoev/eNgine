@@ -3,7 +3,9 @@
 
 //======================================================================================================================================================
 
-std::optional<std::string> open_file(sf::RenderWindow& window, const char* directory) {
+std::optional<std::string> open_file(sf::RenderWindow& window) {
+    static const auto directory = std::filesystem::current_path().string().c_str();
+
     char filename[MAX_PATH];
     ZeroMemory(&filename, sizeof(filename));
 
