@@ -63,7 +63,7 @@ void resources_ui(ResourceManager& resource_manager, sf::RenderWindow& window) {
 
 	if (ImGui::TreeNode("Textures")) {
 		for (const auto& it : resource_manager.textures) {
-			ImGui::Text(it.first.c_str());
+			ImGui::Text(it.first.filename().string().c_str());
 		}
 
 		ImGui::TreePop();
@@ -71,7 +71,7 @@ void resources_ui(ResourceManager& resource_manager, sf::RenderWindow& window) {
 
 	if (ImGui::TreeNode("Sounds")) {
 		for (const auto& it : resource_manager.sound_buffers) {
-			ImGui::Text(it.first.c_str());
+			ImGui::Text(it.first.filename().string().c_str());
 		}
 
 		ImGui::TreePop();
@@ -79,7 +79,7 @@ void resources_ui(ResourceManager& resource_manager, sf::RenderWindow& window) {
 
 	if (ImGui::TreeNode("Fonts")) {
 		for (const auto& it : resource_manager.fonts) {
-			ImGui::Text(it.first.c_str());
+			ImGui::Text(it.first.filename().string().c_str());
 		}
 
 		ImGui::TreePop();
@@ -87,7 +87,7 @@ void resources_ui(ResourceManager& resource_manager, sf::RenderWindow& window) {
 
 	if (ImGui::TreeNode("Music")) {
 		for (const auto& it : resource_manager.music) {
-			ImGui::Text(it.first.c_str());
+			ImGui::Text(it.first.filename().string().c_str());
 		}
 
 		ImGui::TreePop();

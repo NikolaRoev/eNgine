@@ -3,7 +3,7 @@
 
 //======================================================================================================================================================
 
-std::optional<std::string> open_file(sf::RenderWindow& window) {
+std::optional<std::filesystem::path> open_file(sf::RenderWindow& window) {
     static const auto directory = std::filesystem::current_path().string();
 
     char filename[MAX_PATH];
