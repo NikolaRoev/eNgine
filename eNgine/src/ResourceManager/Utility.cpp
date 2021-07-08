@@ -4,7 +4,7 @@
 //======================================================================================================================================================
 
 std::optional<std::string> open_file(sf::RenderWindow& window) {
-    static const auto directory = std::filesystem::current_path().string().c_str();
+    static const auto directory = std::filesystem::current_path().string();
 
     char filename[MAX_PATH];
     ZeroMemory(&filename, sizeof(filename));
@@ -19,7 +19,7 @@ std::optional<std::string> open_file(sf::RenderWindow& window) {
     ofn.lpstrFile = filename;
     ofn.nMaxFile = MAX_PATH;
     ofn.lpstrTitle = "Select File";
-    ofn.lpstrInitialDir = directory;
+    ofn.lpstrInitialDir = directory.c_str();
     ofn.Flags = OFN_DONTADDTORECENT | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
 
     if (GetOpenFileNameA(&ofn)) {
