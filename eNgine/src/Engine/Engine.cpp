@@ -31,6 +31,7 @@ void Engine::loop() {
 
 
 		//UI:
+		menu_bar_ui();
 		resources_ui(resource_manager, window);
 
 		//Draw:
