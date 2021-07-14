@@ -133,6 +133,32 @@ void resources_ui(ResourceManager& resource_manager, sf::RenderWindow& window) {
 		ImGui::TreePop();
 	}
 
+
+
+	//Fix up so the folder are auto generated and put the drag drop stuff inside.
+
+
+	if (ImGui::BeginDragDropSource()) {
+		ImGui::SetDragDropPayload("TEST", NULL, 0);
+
+		ImGui::Text("This is a drag and drop source");
+
+		ImGui::EndDragDropSource();
+	}
+
+	if (ImGui::BeginDragDropTarget()) {
+		if (auto temp = ImGui::AcceptDragDropPayload("TEST")) {
+			LOG_TRACE("TEST");
+		}
+		
+
+
+		ImGui::EndDragDropTarget();
+	}
+
+
+
+
 	ImGui::End();
 }
 
