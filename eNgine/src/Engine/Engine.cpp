@@ -8,10 +8,6 @@
 
 Engine::Engine() {
 	std::filesystem::create_directory("../assets");
-	std::filesystem::create_directory("../assets/textures");
-	std::filesystem::create_directory("../assets/fonts");
-	std::filesystem::create_directory("../assets/sounds");
-	std::filesystem::create_directory("../assets/music");
 
 	window.create(sf::VideoMode{ 1360, 768, 32 }, "eNgine");
 	window.setFramerateLimit(60);

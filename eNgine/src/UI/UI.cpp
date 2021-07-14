@@ -73,6 +73,42 @@ void add_resource(ResourceManager& resource_manager, const std::filesystem::path
 
 //======================================================================================================================================================
 
+void recursive_node_create(const std::filesystem::path& path) {
+	for (auto& entry : std::filesystem::directory_iterator(path)) {
+		if (entry.is_directory()) {
+			if (ImGui::TreeNode(entry.path().filename().string().c_str())) {
+				recursive_node_create(entry.path());
+
+				ImGui::TreePop();
+			}
+		}
+		else {
+			if (ImGui::Selectable(entry.path().filename().string().c_str())) {
+				//TO DO: Maybe add a pop-up with the preview of the various resource files if this is clicked.
+			}
+		}
+
+			
+		if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+			ImGui::SetDragDropPayload("PATH", entry.path().string().data(), entry.path().string().size());
+
+			ImGui::Text(entry.path().filename().string().c_str());
+
+			ImGui::EndDragDropSource();
+		}
+
+		if (ImGui::BeginDragDropTarget()) {
+			if (auto payload = ImGui::AcceptDragDropPayload("PATH")) {
+				std::filesystem::path payload_path(std::string{ (char*)payload->Data, (std::string::size_type)payload->DataSize });
+
+				//TO DO: Handle if dragdrop source and dragdrop target are either file or directory. Good luck lul.
+			}
+
+			ImGui::EndDragDropTarget();
+		}
+	}
+}
+
 void resources_ui(ResourceManager& resource_manager, sf::RenderWindow& window) {
 	ImGui::Begin("Resources");
 
@@ -82,82 +118,12 @@ void resources_ui(ResourceManager& resource_manager, sf::RenderWindow& window) {
 			auto path = std::filesystem::path(file.value());
 			load_resource(resource_manager, path);
 		}
-	}
-
-	ImGui::SameLine();
-
-	if (ImGui::Button("REFRESH")) {
-		for (const auto& each : std::filesystem::recursive_directory_iterator("../assets")) {
-			add_resource(resource_manager, each.path());
-		}
+		//TO DO: Rework this.
 	}
 
 	ImGui::Separator();
 
-
-	if (ImGui::TreeNode("Textures")) {
-		for (const auto& it : resource_manager.textures) {
-			if (ImGui::TreeNode(it.first.filename().string().c_str())) {
-				ImGui::Text(std::format("Resolution: {} x {}", it.second.getSize().x, it.second.getSize().y).c_str());
-				ImGui::Text(std::format("Size: {}", std::filesystem::file_size(it.first)).c_str());
-				ImGui::Image(it.second.getNativeHandle(), {100, 100});
-
-				ImGui::TreePop();
-			}
-		}
-
-		ImGui::TreePop();
-	}
-
-	if (ImGui::TreeNode("Sounds")) {
-		for (const auto& it : resource_manager.sound_buffers) {
-			ImGui::Text(it.first.filename().string().c_str());
-		}
-
-		ImGui::TreePop();
-	}
-
-	if (ImGui::TreeNode("Fonts")) {
-		for (const auto& it : resource_manager.fonts) {
-			ImGui::Text(it.first.filename().string().c_str());
-		}
-
-		ImGui::TreePop();
-	}
-
-	if (ImGui::TreeNode("Music")) {
-		for (const auto& it : resource_manager.music) {
-			ImGui::Text(it.first.filename().string().c_str());
-		}
-
-		ImGui::TreePop();
-	}
-
-
-
-	//Fix up so the folder are auto generated and put the drag drop stuff inside.
-
-
-	if (ImGui::BeginDragDropSource()) {
-		ImGui::SetDragDropPayload("TEST", NULL, 0);
-
-		ImGui::Text("This is a drag and drop source");
-
-		ImGui::EndDragDropSource();
-	}
-
-	if (ImGui::BeginDragDropTarget()) {
-		if (auto temp = ImGui::AcceptDragDropPayload("TEST")) {
-			LOG_TRACE("TEST");
-		}
-		
-
-
-		ImGui::EndDragDropTarget();
-	}
-
-
-
+	recursive_node_create("../assets");
 
 	ImGui::End();
 }

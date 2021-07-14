@@ -4,7 +4,7 @@
 //======================================================================================================================================================
 
 class ResourceManager {
-public:
+private:
 	std::map<std::filesystem::path, sf::Texture> textures;
 	std::map<std::filesystem::path, sf::Font> fonts;
 	std::map<std::filesystem::path, sf::SoundBuffer> sound_buffers;
