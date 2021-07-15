@@ -45,9 +45,9 @@ void recursive_node_create(const std::filesystem::path& path) {
 				std::filesystem::path payload_path(std::string{ static_cast<char*>(payload->Data), static_cast<std::string::size_type>(payload->DataSize) });
 
 				if (entry.is_directory()) {
-					//Add if entry is not directory so we can throw anywhere ye.
-					//Fix so  relative paths don't get fucked.
-					std::filesystem::rename(payload_path, entry.path() / payload_path.filename());
+					std::error_code error_code;
+					std::filesystem::rename(payload_path, entry.path() / payload_path.filename(), error_code);
+					LOG_WARN("File move operation error: {}", error_code.message());
 
 					ImGui::EndDragDropTarget();
 					if (open_node) {
@@ -73,7 +73,27 @@ void recursive_node_create(const std::filesystem::path& path) {
 void resources_ui(ResourceManager& resource_manager, sf::RenderWindow& window) {
 	ImGui::Begin("Resources");
 
-	recursive_node_create("..\\assets");
+	std::filesystem::path base_path("..\\assets");
+
+	bool assets_node = ImGui::TreeNodeEx(base_path.filename().string().c_str(), ImGuiTreeNodeFlags_DefaultOpen);
+
+	if (ImGui::BeginDragDropTarget()) {
+		if (auto payload = ImGui::AcceptDragDropPayload("PATH")) {
+			std::filesystem::path payload_path(std::string{ static_cast<char*>(payload->Data), static_cast<std::string::size_type>(payload->DataSize) });
+
+			std::error_code error_code;
+			std::filesystem::rename(payload_path, base_path / payload_path.filename(), error_code);
+			LOG_WARN("File move operation error: {}", error_code.message());
+		}
+
+		ImGui::EndDragDropTarget();
+	}
+
+	if (assets_node) {
+		recursive_node_create(base_path);
+
+		ImGui::TreePop();
+	}
 
 	ImGui::End();
 }
