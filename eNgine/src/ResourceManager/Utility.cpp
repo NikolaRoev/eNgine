@@ -49,3 +49,18 @@ std::optional<std::filesystem::path> open_file(sf::RenderWindow& window) {
 }
 
 //======================================================================================================================================================
+
+void run_file(const std::string& file_path) {
+    SHELLEXECUTEINFOA seia;
+    ZeroMemory(&seia, sizeof(seia));
+
+    seia.cbSize = sizeof(seia);
+    seia.lpFile = file_path.c_str();
+    seia.nShow = SW_SHOW;
+
+    if (!ShellExecuteExA(&seia)) {
+        LOG_ERROR("Failed to open file [{}], with error: {}.", file_path, GetLastError());
+    }
+}
+
+//======================================================================================================================================================

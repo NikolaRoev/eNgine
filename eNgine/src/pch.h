@@ -5,6 +5,7 @@
 #ifdef _WIN32
 	#include <Windows.h>
 	#include <commdlg.h>
+	#include <shellapi.h>
 
 	#undef min
 	#undef max

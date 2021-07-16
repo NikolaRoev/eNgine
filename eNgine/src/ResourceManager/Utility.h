@@ -5,4 +5,6 @@
 
 std::optional<std::filesystem::path> open_file(sf::RenderWindow& window);
 
+void run_file(const std::string& file_path);
+
 //======================================================================================================================================================

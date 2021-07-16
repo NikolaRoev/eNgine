@@ -76,8 +76,10 @@ void recursive_node_create(const std::filesystem::path& path, sf::RenderWindow& 
 			}
 		}
 		else {
-			if (ImGui::Selectable(entry.path().filename().string().c_str())) {
-				//TO DO: Maybe add a pop-up with the preview of the various resource files if this is clicked.
+			if (ImGui::Selectable(entry.path().filename().string().c_str(), false, ImGuiSelectableFlags_AllowDoubleClick)) {
+				if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+					run_file(entry.path().string());
+				}
 			}
 			if (ImGui::BeginPopupContextItem()) {
 
