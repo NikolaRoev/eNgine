@@ -9,7 +9,9 @@ CMakeCache.txt
 
 CMakeFiles/
 Debug/
+MinSizeRel/
 Release/
+RelWithDebInfo/
 eNgine.dir/
 x64/
 
