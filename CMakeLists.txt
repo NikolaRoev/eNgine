@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-
-project(eNgine)
+project(eNgine CXX)
 set(CMAKE_CXX_STANDARD 20)
 
 if (MSVC)
@@ -37,14 +36,14 @@ target_precompile_headers(${PROJECT_NAME} PRIVATE src/pch.h)
 add_compile_definitions(SFML_STATIC)
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
-                           ${CMAKE_BINARY_DIR}/src/
-                           ${CMAKE_BINARY_DIR}/vendor/
-                           ${CMAKE_BINARY_DIR}/vendor/SFML-2.5.1/include/
-                           ${CMAKE_BINARY_DIR}/vendor/imgui-1.83/
-                           ${CMAKE_BINARY_DIR}/vendor/imgui-sfml-2.3/
+                           src
+                           vendor
+                           vendor/SFML-2.5.1/include
+                           vendor/imgui-1.83
+                           vendor/imgui-sfml-2.3
                           )
 
-target_link_directories(${PROJECT_NAME} PRIVATE ${CMAKE_BINARY_DIR}/vendor/SFML-2.5.1/lib/)
+target_link_directories(${PROJECT_NAME} PRIVATE vendor/SFML-2.5.1/lib)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
                       opengl32.lib
@@ -65,6 +64,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy
-                        ${CMAKE_BINARY_DIR}/vendor/SFML-2.5.1/bin/openal32.dll
-                        ${CMAKE_BINARY_DIR}/$<CONFIG>/openal32.dll
+                        vendor/SFML-2.5.1/bin/openal32.dll
+                        $<CONFIG>/openal32.dll
                    COMMENT "Copied openal32.dll.")
