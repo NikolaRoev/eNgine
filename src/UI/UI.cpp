@@ -212,7 +212,7 @@ void recursive_node_create(const std::filesystem::path& path, sf::RenderWindow& 
 
 void resources_ui(ResourceManager& resource_manager, sf::RenderWindow& window) {
 	//Base path where all assets are put in. Can't rename/move/delete this folder.
-	const std::filesystem::path base_path("..\\assets");
+	const std::filesystem::path base_path("assets");
 
 
 	ImGui::Begin("Resources");
