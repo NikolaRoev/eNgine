@@ -50,7 +50,6 @@ void recursive_node_create(const std::filesystem::path& path, sf::RenderWindow& 
 				}
 
 				if (ImGui::Button("New Folder")) {
-					size_t new_folder_number = 1;
 					std::error_code error_code;
 
 					//Handle if there already is a "New Folder \ (n)".
@@ -62,6 +61,7 @@ void recursive_node_create(const std::filesystem::path& path, sf::RenderWindow& 
 						}
 					}
 					else {
+						size_t new_folder_number = 1;
 						while (std::filesystem::exists(entry.path() / std::format("New Folder ({})", new_folder_number), error_code)) {
 							new_folder_number++;
 						}
@@ -238,7 +238,6 @@ void resources_ui(ResourceManager& resource_manager, sf::RenderWindow& window) {
 		}
 
 		if (ImGui::Button("New Folder")) {
-			size_t new_folder_number = 1;
 			std::error_code error_code;
 
 			//Handle if there already is a "New Folder \ (n)".
@@ -250,6 +249,7 @@ void resources_ui(ResourceManager& resource_manager, sf::RenderWindow& window) {
 				}
 			}
 			else {
+				size_t new_folder_number = 1;
 				while (std::filesystem::exists(base_path / std::format("New Folder ({})", new_folder_number), error_code)) {
 					new_folder_number++;
 				}
