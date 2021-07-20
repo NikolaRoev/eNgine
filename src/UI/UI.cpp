@@ -217,56 +217,8 @@ void resources_ui(ResourceManager& resource_manager, sf::RenderWindow& window) {
 
 	ImGui::Begin("Resources");
 
-	bool assets_node = ImGui::TreeNodeEx(base_path.filename().string().c_str(), ImGuiTreeNodeFlags_DefaultOpen);
 
-	//Right click context menu.
-	if (ImGui::BeginPopupContextItem()) {
-		ImGui::Text("Add");
-		ImGui::Separator();
-
-		if (ImGui::Button("Existing File")) {
-			if (auto add_path = open_file(window); add_path.has_value()) {
-				std::error_code error_code;
-				std::filesystem::copy_file(add_path.value(), base_path / add_path.value().filename(), error_code);
-
-				if (error_code) {
-					LOG_WARN("File copy operation error: {}", error_code.message());
-				}
-			}
-
-			ImGui::CloseCurrentPopup();
-		}
-
-		if (ImGui::Button("New Folder")) {
-			std::error_code error_code;
-
-			//Handle if there already is a "New Folder \ (n)".
-			if (!std::filesystem::exists(base_path / "New Folder", error_code)) {
-				std::filesystem::create_directory(base_path / "New Folder", error_code);
-
-				if (error_code) {
-					LOG_WARN("Create \"New Folder\" error: {}", error_code.message());
-				}
-			}
-			else {
-				size_t new_folder_number = 1;
-				while (std::filesystem::exists(base_path / std::format("New Folder ({})", new_folder_number), error_code)) {
-					new_folder_number++;
-				}
-				std::filesystem::create_directory(base_path / std::format("New Folder ({})", new_folder_number), error_code);
-
-				if (error_code) {
-					LOG_WARN("Create \"New Folder\" error: {}", error_code.message());
-				}
-			}
-
-			ImGui::CloseCurrentPopup();
-		}
-
-		ImGui::EndPopup();
-	}
-
-	//We only need the "assets" TreeNode as a DragDropTarget as we are not going to move it.
+	//DragDropTarget for resources window.
 	if (ImGui::BeginDragDropTarget()) {
 		if (auto payload = ImGui::AcceptDragDropPayload("PATH")) {
 			std::filesystem::path payload_path(std::string{ static_cast<char*>(payload->Data), static_cast<std::string::size_type>(payload->DataSize) });
@@ -282,12 +234,52 @@ void resources_ui(ResourceManager& resource_manager, sf::RenderWindow& window) {
 		ImGui::EndDragDropTarget();
 	}
 
-	//Recursive call and TreePop here so we can generate DragDropSource and Target even if TreeNode is not open.
-	if (assets_node) {
-		recursive_node_create(base_path, window);
 
-		ImGui::TreePop();
+	if (ImGui::Button("Add File")) {
+		if (auto add_path = open_file(window); add_path.has_value()) {
+			std::error_code error_code;
+			std::filesystem::copy_file(add_path.value(), base_path / add_path.value().filename(), error_code);
+
+			if (error_code) {
+				LOG_WARN("File copy operation error: {}", error_code.message());
+			}
+		}
 	}
+
+
+	ImGui::SameLine();
+
+
+	if (ImGui::Button("New Folder")) {
+		std::error_code error_code;
+
+		//Handle if there already is a "New Folder \ (n)".
+		if (!std::filesystem::exists(base_path / "New Folder", error_code)) {
+			std::filesystem::create_directory(base_path / "New Folder", error_code);
+
+			if (error_code) {
+				LOG_WARN("Create \"New Folder\" error: {}", error_code.message());
+			}
+		}
+		else {
+			size_t new_folder_number = 1;
+			while (std::filesystem::exists(base_path / std::format("New Folder ({})", new_folder_number), error_code)) {
+				new_folder_number++;
+			}
+			std::filesystem::create_directory(base_path / std::format("New Folder ({})", new_folder_number), error_code);
+
+			if (error_code) {
+				LOG_WARN("Create \"New Folder\" error: {}", error_code.message());
+			}
+		}
+	}
+
+
+	ImGui::Separator();
+
+
+	recursive_node_create(base_path, window);
+
 
 	ImGui::End();
 }
