@@ -29,75 +29,58 @@ void recursive_node_create(const std::filesystem::path& path, sf::RenderWindow& 
 
 		//Handle folders.
 		if (entry.is_directory()) {
-			open_node = ImGui::TreeNodeEx(entry.path().filename().string().c_str());
+			open_node = ImGui::TreeNodeEx(std::format("{}##{}", entry.path().filename().string(), entry.path().string()).c_str());
 
 			//Right click context menu.
 			if (ImGui::BeginPopupContextItem()) {
-				ImGui::Text("Add");
+				//"Add" sub-menu.
+				if (ImGui::BeginMenu("Add##Recursive")) {
+					//Existing resource file button.
+					if (ImGui::MenuItem("Resource File##Recursive")) {
+						if (auto add_path = open_file(window); add_path.has_value()) {
+							std::error_code error_code;
+							std::filesystem::copy_file(add_path.value(), entry.path() / add_path.value().filename(), error_code);
+
+							if (error_code) {
+								LOG_WARN("File copy operation error: {}", error_code.message());
+							}
+						}
+					}
+					//New folder button.
+					if (ImGui::MenuItem("New Folder##Recursive")) {
+						std::error_code error_code;
+
+						//Create the new folder.
+						if (!std::filesystem::exists(entry.path() / "New Folder", error_code)) {
+							std::filesystem::create_directory(entry.path() / "New Folder", error_code);
+						}
+						//Handle if there already is a "New Folder \ (n)".
+						else {
+							size_t new_folder_number = 1;
+							while (std::filesystem::exists(entry.path() / std::format("New Folder ({})", new_folder_number), error_code)) {
+								new_folder_number++;
+							}
+							std::filesystem::create_directory(entry.path() / std::format("New Folder ({})", new_folder_number), error_code);
+						}
+
+						if (error_code) {
+							LOG_WARN("Create \"New Folder\" error: {}", error_code.message());
+						}
+					}
+
+					ImGui::EndMenu();
+				}
+
 				ImGui::Separator();
 
-				if (ImGui::Button("Existing File")) {
-					if (auto add_path = open_file(window); add_path.has_value()) {
-						std::error_code error_code;
-						std::filesystem::copy_file(add_path.value(), entry.path() / add_path.value().filename(), error_code);
-
-						if (error_code) {
-							LOG_WARN("File copy operation error: {}", error_code.message());
-						}
-					}
-
-					ImGui::CloseCurrentPopup();
+				//Rename button.
+				if (ImGui::MenuItem("Rename##Recursive")) {
+					//TO DO:
 				}
 
-				if (ImGui::Button("New Folder")) {
-					std::error_code error_code;
-
-					//Handle if there already is a "New Folder \ (n)".
-					if (!std::filesystem::exists(entry.path() / "New Folder", error_code)) {
-						std::filesystem::create_directory(entry.path() / "New Folder", error_code);
-
-						if (error_code) {
-							LOG_WARN("Create \"New Folder\" error: {}", error_code.message());
-						}
-					}
-					else {
-						size_t new_folder_number = 1;
-						while (std::filesystem::exists(entry.path() / std::format("New Folder ({})", new_folder_number), error_code)) {
-							new_folder_number++;
-						}
-						std::filesystem::create_directory(entry.path() / std::format("New Folder ({})", new_folder_number), error_code);
-
-						if (error_code) {
-							LOG_WARN("Create \"New Folder\" error: {}", error_code.message());
-						}
-					}
-
-					ImGui::CloseCurrentPopup();
-				}
-
-				static std::string temp_name;
-				ImGui::InputText("Rename", &temp_name);
-
-				if (ImGui::Button("Rename##Button")) {
-					std::filesystem::path temp_new_path(entry.path().parent_path());
-					temp_new_path /= temp_name;
-
-					std::error_code error_code;
-					std::filesystem::rename(entry.path(), temp_new_path, error_code);
-
-					if (error_code) {
-						LOG_WARN("Rename error: {}", error_code.message());
-					}
-
-					temp_name = "";
-					ImGui::CloseCurrentPopup();
-
-				}
-
-				if (ImGui::Button("Delete")) {
+				//Delete button.
+				if (ImGui::MenuItem("Delete##Recursive")) {
 					path_to_delete = entry.path();
-
-					ImGui::CloseCurrentPopup();
 				}
 
 				ImGui::EndPopup();
@@ -110,32 +93,17 @@ void recursive_node_create(const std::filesystem::path& path, sf::RenderWindow& 
 					run_file(entry.path().string());
 				}
 			}
+
 			//Right click context menu.
 			if (ImGui::BeginPopupContextItem()) {
-
-				static std::string temp_name;
-				ImGui::InputText("Rename", &temp_name);
-
-				if (ImGui::Button("Rename##Button")) {
-					std::filesystem::path temp_new_path(entry.path().parent_path());
-					temp_new_path /= temp_name;
-					temp_new_path += entry.path().extension();
-
-					std::error_code error_code;
-					std::filesystem::rename(entry.path(), temp_new_path, error_code);
-
-					if (error_code) {
-						LOG_WARN("Rename error: {}", error_code.message());
-					}
-
-					temp_name = "";
-					ImGui::CloseCurrentPopup();
+				//Rename button.
+				if (ImGui::MenuItem("Rename##Recursive")) {
+					//TO DO:
 				}
 
-				if (ImGui::Button("Delete")) {
+				//Delete button.
+				if (ImGui::MenuItem("Delete##Recursive")) {
 					path_to_delete = entry.path();
-
-					ImGui::CloseCurrentPopup();
 				}
 
 				ImGui::EndPopup();
@@ -152,39 +120,31 @@ void recursive_node_create(const std::filesystem::path& path, sf::RenderWindow& 
 			ImGui::EndDragDropSource();
 		}
 
-		//If target is folder moves the Payload to the folder, if target is file, moves the Payload to the folder that file is in.
+		//If target is a folder moves the Payload to the folder, if target is a file, moves the Payload to the folder that file is in.
 		if (ImGui::BeginDragDropTarget()) {
 			if (auto payload = ImGui::AcceptDragDropPayload("PATH")) {
 				std::filesystem::path payload_path(std::string{ static_cast<char*>(payload->Data), static_cast<std::string::size_type>(payload->DataSize) });
 
+				std::filesystem::path new_path{};
 				if (entry.is_directory()) {
-					std::error_code error_code;
-					std::filesystem::rename(payload_path, entry.path() / payload_path.filename(), error_code);
-
-					if (error_code) {
-						LOG_WARN("File move operation error: {}", error_code.message());
-					}
-
-					ImGui::EndDragDropTarget();
-					if (open_node) {
-						ImGui::TreePop();
-					}
-					break;
+					new_path = entry.path() / payload_path.filename();
 				}
 				else {
-					std::error_code error_code;
-					std::filesystem::rename(payload_path, entry.path().parent_path() / payload_path.filename(), error_code);
-
-					if (error_code) {
-						LOG_WARN("File move operation error: {}", error_code.message());
-					}
-
-					ImGui::EndDragDropTarget();
-					if (open_node) {
-						ImGui::TreePop();
-					}
-					break;
+					new_path = entry.path().parent_path() / payload_path.filename();
 				}
+
+				std::error_code error_code;
+				std::filesystem::rename(payload_path, new_path, error_code);
+
+				if (error_code) {
+					LOG_WARN("File move operation error: {}", error_code.message());
+				}
+
+				ImGui::EndDragDropTarget();
+				if (open_node) {
+					ImGui::TreePop();
+				}
+				break;
 			}
 
 			ImGui::EndDragDropTarget();
@@ -211,11 +171,7 @@ void recursive_node_create(const std::filesystem::path& path, sf::RenderWindow& 
 //======================================================================================================================================================
 
 void resources_ui(ResourceManager& resource_manager, sf::RenderWindow& window) {
-	//Base path where all assets are put in. Can't rename/move/delete this folder.
-	const std::filesystem::path base_path("assets");
-
-
-	ImGui::Begin("Resources");
+	ImGui::Begin("Resources##resources_ui");
 
 
 	//DragDropTarget for resources window.
@@ -235,7 +191,8 @@ void resources_ui(ResourceManager& resource_manager, sf::RenderWindow& window) {
 	}
 
 
-	if (ImGui::Button("Add File")) {
+	//Add existing file button.
+	if (ImGui::Button("Add File##resources_ui")) {
 		if (auto add_path = open_file(window); add_path.has_value()) {
 			std::error_code error_code;
 			std::filesystem::copy_file(add_path.value(), base_path / add_path.value().filename(), error_code);
@@ -250,27 +207,25 @@ void resources_ui(ResourceManager& resource_manager, sf::RenderWindow& window) {
 	ImGui::SameLine();
 
 
-	if (ImGui::Button("New Folder")) {
+	//New folder button.
+	if (ImGui::Button("New Folder##resources_ui")) {
 		std::error_code error_code;
 
-		//Handle if there already is a "New Folder \ (n)".
+		//Create the new folder.
 		if (!std::filesystem::exists(base_path / "New Folder", error_code)) {
 			std::filesystem::create_directory(base_path / "New Folder", error_code);
-
-			if (error_code) {
-				LOG_WARN("Create \"New Folder\" error: {}", error_code.message());
-			}
 		}
+		//Handle if there already is a "New Folder \ (n)".
 		else {
 			size_t new_folder_number = 1;
 			while (std::filesystem::exists(base_path / std::format("New Folder ({})", new_folder_number), error_code)) {
 				new_folder_number++;
 			}
 			std::filesystem::create_directory(base_path / std::format("New Folder ({})", new_folder_number), error_code);
+		}
 
-			if (error_code) {
-				LOG_WARN("Create \"New Folder\" error: {}", error_code.message());
-			}
+		if (error_code) {
+			LOG_WARN("Create \"New Folder\" error: {}", error_code.message());
 		}
 	}
 

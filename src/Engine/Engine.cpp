@@ -7,7 +7,7 @@
 //======================================================================================================================================================
 
 Engine::Engine() {
-	std::filesystem::create_directory("assets");
+	std::filesystem::create_directory(base_path);
 
 	window.create(sf::VideoMode{ 1360, 768, 32 }, "eNgine");
 	window.setFramerateLimit(60);
