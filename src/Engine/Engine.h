@@ -1,6 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "ResourceManager/ResourceManager.h"
+#include "Scene/Scene.h"
 
 //======================================================================================================================================================
 
@@ -10,7 +11,11 @@ private:
 	sf::Event event{ sf::Event::MouseMoved };
 	sf::Clock clock;
 
+
 	ResourceManager resource_manager;
+
+	std::unordered_map<std::string, Scene> scenes;
+	Scene* current_scene{ nullptr };
 
 public:
 	Engine();

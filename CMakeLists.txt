@@ -21,6 +21,8 @@ add_executable(${PROJECT_NAME}
                src/ResourceManager/Utility.cpp
                src/UI/UI.h
                src/UI/UI.cpp
+               src/Scene/Scene.h
+               src/Scene/Scene.cpp
                
                vendor/imgui-1.83/imgui.cpp
                vendor/imgui-1.83/imgui_draw.cpp
