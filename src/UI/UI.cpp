@@ -29,8 +29,8 @@ void recursive_node_create(const std::filesystem::path& path, sf::RenderWindow& 
 
 		//Handle folders.
 		if (entry.is_directory()) {
-			open_node = ImGui::TreeNodeEx(std::format("{}##{}", entry.path().filename().string(), entry.path().string()).c_str());
-
+			open_node = ImGui::TreeNodeEx(std::format("##{}", entry.path().string()).c_str(), ImGuiTreeNodeFlags_SpanFullWidth);
+			
 			//Right click context menu.
 			if (ImGui::BeginPopupContextItem()) {
 				//"Add" sub-menu.
@@ -95,6 +95,7 @@ void recursive_node_create(const std::filesystem::path& path, sf::RenderWindow& 
 
 				ImGui::EndPopup();
 			}
+
 		}
 		//Other files.
 		else {
@@ -174,6 +175,17 @@ void recursive_node_create(const std::filesystem::path& path, sf::RenderWindow& 
 			ImGui::EndDragDropTarget();
 		}
 
+		//Draw the correct folder icon for the TreeNodes.
+		if (entry.is_directory()) {
+			ImGui::SameLine();
+			if (open_node) {
+				ImGui::Text(std::format(ICON_FA_FOLDER_OPEN " {}", entry.path().filename().string()).c_str());
+			}
+			else {
+				ImGui::Text(std::format(ICON_FA_FOLDER " {}", entry.path().filename().string()).c_str());
+			}
+		}
+
 		//Recursive call and TreePop here so we can generate DragDropSource and Target even if TreeNode is not open.
 		if (open_node) {
 			recursive_node_create(entry.path(), window);
@@ -216,7 +228,7 @@ void resources_ui(ResourceManager& resource_manager, sf::RenderWindow& window) {
 
 
 	//Add existing file button.
-	if (ImGui::Button("Add File##resources_ui")) {
+	if (ImGui::Button(ICON_FA_PLUS_SQUARE "##resources_ui")) {
 		if (auto add_path = open_file(window); add_path.has_value()) {
 			std::error_code error_code;
 			std::filesystem::copy_file(add_path.value(), base_path / add_path.value().filename(), error_code);
@@ -232,7 +244,7 @@ void resources_ui(ResourceManager& resource_manager, sf::RenderWindow& window) {
 
 
 	//New folder button.
-	if (ImGui::Button("New Folder##resources_ui")) {
+	if (ImGui::Button(ICON_FA_FOLDER_PLUS "##resources_ui")) {
 		std::error_code error_code;
 
 		//Create the new folder.

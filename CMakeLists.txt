@@ -43,6 +43,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
                            vendor/SFML-2.5.1/include
                            vendor/imgui-1.83
                            vendor/imgui-sfml-2.3
+                           vendor/IconFontCppHeaders
                           )
 
 target_link_directories(${PROJECT_NAME} PRIVATE vendor/SFML-2.5.1/lib)
