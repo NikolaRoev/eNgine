@@ -73,9 +73,19 @@ void recursive_node_create(const std::filesystem::path& path, sf::RenderWindow& 
 
 				ImGui::Separator();
 
+				static std::string new_name;
+				ImGui::InputText("##RenameInputFieldRecursive", &new_name);
+
 				//Rename button.
-				if (ImGui::MenuItem("Rename##Recursive")) {
-					//TO DO:
+				if (ImGui::MenuItem("Rename##Recursive") && !new_name.empty()) {
+					std::error_code error_code;
+					std::filesystem::rename(entry.path(), entry.path().parent_path() / new_name, error_code);
+
+					if (error_code) {
+						LOG_WARN("File rename operation error: {}", error_code.message());
+					}
+
+					new_name = "";
 				}
 
 				//Delete button.
@@ -96,9 +106,23 @@ void recursive_node_create(const std::filesystem::path& path, sf::RenderWindow& 
 
 			//Right click context menu.
 			if (ImGui::BeginPopupContextItem()) {
+				static std::string new_name;
+				ImGui::InputText("##RenameInputFieldRecursive", &new_name);
+
 				//Rename button.
-				if (ImGui::MenuItem("Rename##Recursive")) {
-					//TO DO:
+				if (ImGui::MenuItem("Rename##Recursive") && !new_name.empty()) {
+					std::filesystem::path rename_path(entry.path().parent_path());
+					rename_path /= new_name;
+					rename_path += entry.path().extension();
+
+					std::error_code error_code;
+					std::filesystem::rename(entry.path(), rename_path, error_code);
+
+					if (error_code) {
+						LOG_WARN("File rename operation error: {}", error_code.message());
+					}
+
+					new_name = "";
 				}
 
 				//Delete button.
