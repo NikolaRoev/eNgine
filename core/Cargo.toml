@@ -1,0 +1,27 @@
+[package]
+name = "core"
+version = "1.0.0"
+authors = ["Nikola Roev"]
+edition = "2021"
+rust-version = "1.73.0"
+
+[dependencies]
+js-sys = "0.3.69"
+rhai = { version = "1.18.0", features = ["wasm-bindgen"] }
+
+[dependencies.web-sys]
+version = "0.3.69"
+features = [
+  'Document',
+  'Element',
+  'HtmlElement',
+  'Node',
+  'Window',
+  'HtmlCanvasElement',
+  'WebGlBuffer',
+  'WebGlVertexArrayObject',
+  'WebGl2RenderingContext',
+  'WebGlProgram',
+  'WebGlShader',
+  "console"
+]

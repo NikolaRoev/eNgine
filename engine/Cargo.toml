@@ -1,0 +1,32 @@
+[package]
+name = "engine"
+version = "1.0.0"
+authors = ["Nikola Roev"]
+edition = "2021"
+rust-version = "1.73.0"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+js-sys = "0.3.69"
+rhai = { version = "1.18.0", features = ["wasm-bindgen"] }
+wasm-bindgen = "0.2.92"
+core = { path = "../core" }
+
+[dependencies.web-sys]
+version = "0.3.69"
+features = [
+  'Document',
+  'Element',
+  'HtmlElement',
+  'Node',
+  'Window',
+  'HtmlCanvasElement',
+  'WebGlBuffer',
+  'WebGlVertexArrayObject',
+  'WebGl2RenderingContext',
+  'WebGlProgram',
+  'WebGlShader',
+  "console"
+]
