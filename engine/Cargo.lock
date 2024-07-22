@@ -284,7 +284,6 @@ dependencies = [
  "lazy_static",
  "nalgebra-glm",
  "rhai",
- "uuid",
  "wasm-bindgen",
  "web-sys",
 ]

@@ -27,11 +27,11 @@ pub fn init_render() {
         e.replace(Some(Renderer::new(context)))
     });
 }
-pub fn add(id: &uuid::Uuid, sprite: &Sprite) {
+pub fn add(id: &ID, sprite: &Sprite) {
     RENDERER.with(|e| {
         let mut borrow = e.borrow_mut();
         let ren = borrow.as_mut().unwrap();
-        ren.add(*id, sprite, 1024.0, 576.0);
+        ren.add(id.id, sprite, 1024.0, 576.0);
     });
 }
 

@@ -1,6 +1,7 @@
 use std::collections::HashMap;
+use bevy_ecs::{query::Has, schedule::Schedule, system::{Query, Resource}, world::World};
 use web_sys::{WebGl2RenderingContext, WebGlProgram, WebGlVertexArrayObject};
-
+use std::cell::RefCell;
 
 use crate::{program::Program, scene_manager::{Sprite, ID}};
 

@@ -20,7 +20,10 @@ static mut CAMERA_X: f32 = 0.0;
 static mut CAMERA_Y: f32 = 0.0;
 
 
-
+fn scene_manager() -> &'static Mutex<SceneManager> {
+    static SCENE_MANAGER: OnceLock<Mutex<SceneManager>> = OnceLock::new();
+    SCENE_MANAGER.get_or_init(|| Mutex::new(SceneManager::default()))
+}
 
 
 
@@ -32,22 +35,32 @@ fn main() -> Result<(), JsValue> {
     //console::log_1(&format!("Answer: {result}").into());
 
 
-    let scene_name = "name".to_string();
-    SceneManager::init();
-    SceneManager::add_scene(&scene_name);
-    let entity = SceneManager::add_entity(&scene_name, "entity 1").unwrap();
-    SceneManager::add_sprite(&scene_name, &entity);
-    SceneManager::add_transform(&scene_name, &entity);
     
+    
+
+    let mut guard = scene_manager().lock().unwrap();
+    let scene_id = guard.add_scene("test".to_string());
+    let scene = guard.get_scene(&scene_id).unwrap();
+
+    let entity = scene.add_entity("entity 1".to_string());
+    scene.add_sprite(entity);
+    scene.add_transform(entity);
+
+    //let entity_sprite = scene.world.entity(entity).get::<Sprite>().unwrap();
+    //let entity_transform = scene.world.entity(entity).get::<Transform>().unwrap();
+
 
     init_render();
 
-    let binding = SceneManager::get_scenes();
-    let scene = binding.first();
-    let scene = scene.unwrap();
+    
+    
+    for entity in scene.world.iter_entities() {
+        if let Some(sprite) = entity.get::<Sprite>() {
+            let id = entity.get::<ID>().unwrap();
 
-    for (id, sprite) in &scene.sprites {
-        add(id, sprite);
+            add(id, sprite);
+            
+        }
     }
     
     console::log_1(&format!("saa dude").into());

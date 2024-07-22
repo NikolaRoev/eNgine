@@ -1,119 +1,59 @@
-use std::{borrow::Borrow, collections::HashMap, sync::{Mutex, OnceLock}};
-
+use bevy_ecs::prelude::*;
+use bevy_ecs::world::World;
 use uuid::Uuid;
-use web_sys::{WebGl2RenderingContext, WebGlVertexArrayObject};
+use web_sys::WebGl2RenderingContext;
 extern crate nalgebra_glm as glm;
-use std::cell::RefCell;
-use std::rc::Rc;
 
 
 
 
-#[derive(Clone)]
-pub struct ID { pub id: uuid::Uuid, pub name: String }
 
-#[derive(Clone)]
+#[derive(Component)]
+pub struct ID { pub id: uuid::Uuid, name: String }
+
+#[derive(Component)]
 pub struct Sprite { pub scale: glm::Vec2 }
 
-#[derive(Default, Clone)]
+#[derive(Component, Default)]
 pub struct Transform { pub position: glm::Vec3, pub scale: glm::Vec2, pub rotation: f32 }
 
 
-#[derive(Default, Clone)]
 pub struct Scene {
+    pub id: uuid::Uuid,
     pub name: String,
-    
-    pub entities: HashMap<uuid::Uuid, ID>,
-    pub sprites: HashMap<uuid::Uuid, Sprite>,
-    pub transforms: HashMap<uuid::Uuid, Transform>,
+    pub world: World
+}
+
+impl Scene {
+    pub fn add_entity(&mut self, name: String) -> Entity {
+        self.world.spawn( ID { id: uuid::Uuid::new_v4(), name }).id()
+    }
+
+    pub fn add_sprite(&mut self, entity: Entity) {
+        let mut entity_ref = self.world.entity_mut(entity);
+        entity_ref.insert(Sprite { scale: glm::Vec2::new(0.1, 0.1) });
+    }
+
+    pub fn add_transform(&mut self, entity: Entity) {
+        let mut entity_ref = self.world.entity_mut(entity);
+        entity_ref.insert(Transform::default());
+    }
 }
 
 
 #[derive(Default)]
 pub struct SceneManager {
-    pub scenes: HashMap<String, Scene>
+    pub scenes: std::collections::HashMap<uuid::Uuid, Scene>
 }
 
 impl SceneManager {
-    pub fn init() {
-        let _ = SCENE_MANAGER.with(|e| {
-            e.replace(Some(SceneManager::default()))
-        });
+    pub fn get_scene(&mut self, id: &uuid::Uuid) -> Option<&mut Scene> {
+        self.scenes.get_mut(id)
     }
 
-
-    pub fn get_scenes() -> Vec<Scene> {
-        SCENE_MANAGER.with(|e| {
-            let borrow = e.borrow();
-            let scene_manager = borrow.as_ref().unwrap();
-
-            scene_manager.scenes.clone().into_values().collect()
-        })
+    pub fn add_scene(&mut self, name: String) -> uuid::Uuid {
+        let id = Uuid::new_v4();
+        self.scenes.insert(id, Scene { id, name, world: World::default() });
+        id
     }
-
-    pub fn add_scene(name: &String) -> bool {
-        SCENE_MANAGER.with(|e| {
-            let mut borrow = e.borrow_mut();
-            let scene_manager = borrow.as_mut().unwrap();
-
-            if !scene_manager.scenes.contains_key(name) {
-                scene_manager.scenes.insert(name.clone(), Scene { name: name.clone(), ..Default::default() });
-                return true;
-            }
-            
-            false
-        })
-    }
-
-
-    pub fn add_entity(scene_name: &String, entity_name: &str) -> Option<uuid::Uuid> {
-        SCENE_MANAGER.with(|e| {
-            let mut borrow = e.borrow_mut();
-            let scene_manager = borrow.as_mut().unwrap();
-
-            let id = uuid::Uuid::new_v4();
-            if let Some(scene) = scene_manager.scenes.get_mut(scene_name) {
-                scene.entities.insert(id, ID { id, name: entity_name.to_string() });
-                return Some(id);
-            }
-
-            None
-        })
-    }
-
-    pub fn add_sprite(scene_name: &String, entity: &uuid::Uuid) -> bool {
-        SCENE_MANAGER.with(|e| {
-            let mut borrow = e.borrow_mut();
-            let scene_manager = borrow.as_mut().unwrap();
-
-            if let Some(scene) = scene_manager.scenes.get_mut(scene_name) {
-                scene.sprites.insert(*entity, Sprite { scale: glm::Vec2::new(0.1, 0.1) });
-
-                return true;
-            }
-
-            false
-        })
-    }
-
-    pub fn add_transform(scene_name: &String, entity: &uuid::Uuid) -> bool {
-        SCENE_MANAGER.with(|e| {
-            let mut borrow = e.borrow_mut();
-            let scene_manager = borrow.as_mut().unwrap();
-
-            if let Some(scene) = scene_manager.scenes.get_mut(scene_name) {
-                scene.transforms.insert(*entity, Transform::default());
-
-                return true;
-            }
-
-            false
-        })
-    }
-}
-
-
-
-thread_local! {
-    pub static SCENE_MANAGER: RefCell<Option<SceneManager>> = const { RefCell::new(None) };
 }
