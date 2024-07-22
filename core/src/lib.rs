@@ -1,7 +1,8 @@
+pub mod scene_manager;
+pub mod program;
+pub mod renderer;
 
-use web_sys::{WebGl2RenderingContext, WebGlProgram, WebGlShader, console};
-use rhai::{Engine, EvalAltResult};
+use std::error::Error;
 
-pub fn tester() {
-    console::log_1(&format!("Answer").into());
-}
+use web_sys::{WebGl2RenderingContext, WebGlProgram, WebGlShader, console, WebGlUniformLocation};
+use program::Program;

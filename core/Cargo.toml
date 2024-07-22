@@ -6,8 +6,12 @@ edition = "2021"
 rust-version = "1.73.0"
 
 [dependencies]
+bevy_ecs = "0.13.2"
 js-sys = "0.3.69"
 rhai = { version = "1.18.0", features = ["wasm-bindgen"] }
+uuid = { version = "1.8.0", features = ["v4"] }
+nalgebra-glm = "0.18.0"
+bevy_utils = "0.13.2"
 
 [dependencies.web-sys]
 version = "0.3.69"
@@ -23,5 +27,6 @@ features = [
   'WebGl2RenderingContext',
   'WebGlProgram',
   'WebGlShader',
+  "WebGlUniformLocation",
   "console"
 ]
