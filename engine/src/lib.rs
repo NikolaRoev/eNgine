@@ -1,14 +1,17 @@
-use core::{renderer::Renderer, scene_manager::{self, Scene, SceneManager, Sprite, Transform, ID}};
+
 use std::{ sync::{Arc, Mutex, OnceLock}};
 
-use test::{add, draw, init_render};
+use renderer::Renderer;
+use scene_manager::SceneManager;
 use wasm_bindgen::prelude::*;
 use web_sys::{WebGl2RenderingContext, WebGlProgram, WebGlShader, console, WebGlUniformLocation};
 use rhai::{run, Engine, EvalAltResult, Locked, Shared};
-use std::cell::RefCell;
-use std::rc::Rc;
 
-mod test;
+
+mod scene_manager;
+mod program;
+mod renderer;
+
 
 
 extern crate nalgebra_glm as glm;
@@ -31,26 +34,24 @@ fn main() -> Result<(), JsValue> {
     //let result = engine.eval::<i64>("40 + 3").unwrap();
     //console::log_1(&format!("Answer: {result}").into());
 
+    Renderer::init();
 
-    let scene_name = "name".to_string();
     SceneManager::init();
-    SceneManager::add_scene(&scene_name);
-    let entity = SceneManager::add_entity(&scene_name, "entity 1").unwrap();
-    SceneManager::add_sprite(&scene_name, &entity);
-    SceneManager::add_transform(&scene_name, &entity);
-    
+    let scene = SceneManager::add_scene("name");
 
-    init_render();
+    console::log_1(&format!("rust scene {scene}").into());
+
+    let sprite_id = SceneManager::add_sprite(&scene, "sprite 1".to_string());
+    
 
     let binding = SceneManager::get_scenes();
-    let scene = binding.first();
-    let scene = scene.unwrap();
+    let scene = binding.get(&scene).unwrap();
 
     for (id, sprite) in &scene.sprites {
-        add(id, sprite);
+        Renderer::add_sprite(*id, sprite, 1024.0, 576.0);
     }
     
-    console::log_1(&format!("saa dude").into());
+    
     
     let f: std::rc::Rc<std::cell::RefCell<Option<Closure<dyn FnMut(f64)>>>> = std::rc::Rc::new(std::cell::RefCell::new(None));
     let outer_f: std::rc::Rc<std::cell::RefCell<Option<Closure<dyn FnMut(f64)>>>> = f.clone();
@@ -64,7 +65,7 @@ fn main() -> Result<(), JsValue> {
 
             
 
-            draw();
+            Renderer::draw();
             
             
 

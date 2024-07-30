@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 // eslint-disable-next-line camelcase
-import init, { move_rect, move_cam } from "../../../engine/pkg/engine";
+import init, { move_rect, move_cam, get_scenes } from "../../../engine/pkg/core/engine";
+import SceneExplorer from "../components/SceneExplorer";
+import ResourceExplorer from "../components/ResourceExplorer";
+import Console from "../components/Console";
+import Properties from "../components/Properties";
+import RunBar from "../components/RunBar";
+import DataContextProvider, { DataContext } from "../contexts/data-context";
 
 
 
@@ -33,6 +39,11 @@ function Test() {
     const [state, setState] = useState({x: 0, y: 0, cam_x: 0, cam_y: 0});
 
     useEffect(() => {
+        let t = get_scenes();
+        console.log(t);
+    }, []);
+
+    useEffect(() => {
         move_rect(state.x, state.y);
         move_cam(state.cam_x, state.cam_y);
     }, [state]);
@@ -60,9 +71,19 @@ export default function App() {
     });
 
     return (
-        <div className="grow flex flex-col">
-            {loaded && <Test />}
-            <canvas width={1280} height={576} id="canvas" className="grow"></canvas>
-        </div>
+        <DataContextProvider>
+            <div className="grow grid grid-cols-6 grid-rows-6 gap-0">
+                {loaded && <SceneExplorer className="row-span-3" />}
+                {loaded && <ResourceExplorer className="row-span-3 col-start-1 row-start-4" />}
+                <div className="col-span-4 row-span-4">
+                    <canvas id="canvas" className=""></canvas>
+                </div>
+                {loaded && <Console className="col-span-4 row-span-2 col-start-2 row-start-5" />}
+                {loaded && <div className="row-span-6 col-start-6 row-start-1 flex flex-col">
+                    <RunBar className="p-[10px]" />
+                    <Properties className="grow" />
+                </div> }
+            </div>
+        </DataContextProvider>
     );
 }

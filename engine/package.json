@@ -2,6 +2,7 @@
   "type": "module",
   "scripts": {
     "update-dependencies": "ncu -u && cargo upgrade",
-    "build-wasm": "wasm-pack build --target web"
+    "build-core": "wasm-pack build --target web --out-dir pkg/core",
+    "build-runtime": "wasm-pack build --target web --out-dir pkg/runtime -- --features runtime"
   }
 }
