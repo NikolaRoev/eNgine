@@ -1,14 +1,17 @@
-use core::{renderer::Renderer, scene_manager::{self, Scene, SceneManager, Sprite, Transform, ID}};
+
 use std::{ sync::{Arc, Mutex, OnceLock}};
 
-use test::{add, draw, init_render};
+use renderer::Renderer;
+use scene_manager::SceneManager;
 use wasm_bindgen::prelude::*;
 use web_sys::{WebGl2RenderingContext, WebGlProgram, WebGlShader, console, WebGlUniformLocation};
 use rhai::{run, Engine, EvalAltResult, Locked, Shared};
-use std::cell::RefCell;
-use std::rc::Rc;
 
-mod test;
+
+mod scene_manager;
+mod program;
+mod renderer;
+
 
 
 extern crate nalgebra_glm as glm;
@@ -34,36 +37,24 @@ fn main() -> Result<(), JsValue> {
     //let result = engine.eval::<i64>("40 + 3").unwrap();
     //console::log_1(&format!("Answer: {result}").into());
 
+    Renderer::init();
 
+    SceneManager::init();
+    let scene = SceneManager::add_scene("name");
+
+    console::log_1(&format!("rust scene {scene}").into());
+
+    let sprite_id = SceneManager::add_sprite(&scene, "sprite 1".to_string());
     
-    
 
-    let mut guard = scene_manager().lock().unwrap();
-    let scene_id = guard.add_scene("test".to_string());
-    let scene = guard.get_scene(&scene_id).unwrap();
+    let binding = SceneManager::get_scenes();
+    let scene = binding.get(&scene).unwrap();
 
-    let entity = scene.add_entity("entity 1".to_string());
-    scene.add_sprite(entity);
-    scene.add_transform(entity);
-
-    //let entity_sprite = scene.world.entity(entity).get::<Sprite>().unwrap();
-    //let entity_transform = scene.world.entity(entity).get::<Transform>().unwrap();
-
-
-    init_render();
-
-    
-    
-    for entity in scene.world.iter_entities() {
-        if let Some(sprite) = entity.get::<Sprite>() {
-            let id = entity.get::<ID>().unwrap();
-
-            add(id, sprite);
-            
-        }
+    for (id, sprite) in &scene.sprites {
+        Renderer::add_sprite(*id, sprite, 1024.0, 576.0);
     }
     
-    console::log_1(&format!("saa dude").into());
+    
     
     let f: std::rc::Rc<std::cell::RefCell<Option<Closure<dyn FnMut(f64)>>>> = std::rc::Rc::new(std::cell::RefCell::new(None));
     let outer_f: std::rc::Rc<std::cell::RefCell<Option<Closure<dyn FnMut(f64)>>>> = f.clone();
@@ -77,7 +68,7 @@ fn main() -> Result<(), JsValue> {
 
             
 
-            draw();
+            Renderer::draw();
             
             
 

@@ -1,7 +1,0 @@
-{
-  "type": "module",
-  "scripts": {
-    "update-dependencies": "ncu -u && cargo upgrade",
-    "build-wasm": "wasm-pack build --target web"
-  }
-}
